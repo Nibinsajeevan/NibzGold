@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Nibz the Trader Live</title>
-<meta name="description" content="Live XAU/USD desk by Nibz the Trader: gold chart, sessions, kill zones, daily close countdown, news, calendar and lot calculator.">
+<meta name="description" content="Live XAU/USD desk by Nibz the Trader: flash news, gold takeaways, sentiment, gold vs dollar, sessions, calendar and lot calculator.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;800;900&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap">
@@ -26,11 +26,12 @@
   .wrap{max-width:1440px;margin:0 auto}
   a{color:var(--gold-hi)}
   :focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+  button{font:inherit;color:inherit;cursor:pointer}
 
   /* ---------- Header ---------- */
-  header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:10;background:rgba(11,10,8,.92);
-    backdrop-filter:blur(8px);border-bottom:1px solid var(--line);margin-inline:-16px;padding:10px 16px}
-  .top-in{max-width:1440px;margin:0 auto;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+  header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:10;background:rgba(11,10,8,.94);
+    backdrop-filter:blur(8px);margin-inline:-16px}
+  .top-in{max-width:1440px;margin:0 auto;display:flex;align-items:center;gap:16px;flex-wrap:wrap;padding:10px 16px}
   .brand{display:flex;align-items:baseline;gap:10px;margin-right:auto}
   .brand h1{margin:0;font:900 30px/1 var(--display);letter-spacing:.02em;text-transform:uppercase}
   .brand h1 .g{color:var(--gold)}
@@ -42,14 +43,36 @@
   .clocks b{display:block;color:var(--text);font-weight:600;font-size:15px;font-variant-numeric:tabular-nums}
   .handle{font:600 12px var(--mono);color:var(--gold);text-decoration:none}
 
-  .tape{margin-inline:-16px;border-bottom:1px solid var(--line);min-height:46px}
+  /* Flash ticker */
+  .flash{display:flex;align-items:stretch;border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:var(--panel)}
+  .flash-lbl{flex:none;display:flex;align-items:center;gap:6px;padding:0 12px;background:var(--crimson);color:#fff;
+    font:800 14px/1 var(--display);letter-spacing:.14em;text-transform:uppercase}
+  .flash-view{flex:1;overflow:hidden;position:relative;min-width:0}
+  .flash-track{display:inline-flex;gap:36px;white-space:nowrap;padding:9px 16px;animation:scroll 90s linear infinite;will-change:transform}
+  .flash-view:hover .flash-track{animation-play-state:paused}
+  @keyframes scroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+  .fl-item{display:inline-flex;gap:8px;align-items:center;font-size:13px;color:var(--text);text-decoration:none}
+  .fl-item time{font:400 11px var(--mono);color:var(--muted)}
+  .fl-empty{padding:9px 16px;color:var(--muted);font-size:13px}
 
-  /* ---------- Grid ---------- */
-  .grid{display:grid;gap:14px;margin-top:14px;grid-template-columns:minmax(0,1fr) 360px}
+  /* Tabs */
+  .tabs{display:flex;gap:4px;max-width:1440px;margin:0 auto;padding:8px 16px 0}
+  .tab{background:none;border:0;border-bottom:3px solid transparent;padding:8px 14px 9px;
+    font:800 16px/1 var(--display);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+  .tab[aria-selected="true"]{color:var(--gold-hi);border-bottom-color:var(--gold)}
+  .tab:hover{color:var(--text)}
+  .tabs-line{border-bottom:1px solid var(--line)}
+
+  /* ---------- Grid & panels ---------- */
+  .view{margin-top:14px}
+  .grid{display:grid;gap:14px;grid-template-columns:minmax(0,1fr) 360px}
+  .pulse-grid{display:grid;gap:14px;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);margin-top:14px}
   .col{display:grid;gap:14px;align-content:start}
   .row3{display:grid;gap:14px;grid-template-columns:repeat(3,minmax(0,1fr));margin-top:14px}
   .row2{display:grid;gap:14px;grid-template-columns:repeat(2,minmax(0,1fr));margin-top:14px}
-  @media (max-width:1100px){ .grid{grid-template-columns:1fr} .row3{grid-template-columns:1fr 1fr} }
+  .quotes{display:grid;gap:14px;grid-template-columns:repeat(4,minmax(0,1fr))}
+  @media (max-width:1100px){ .grid,.pulse-grid{grid-template-columns:1fr} .row3{grid-template-columns:1fr 1fr} .quotes{grid-template-columns:1fr 1fr} }
+  @media (max-width:900px){ .top-in .handle{display:none} }
   @media (max-width:700px){ .row3,.row2{grid-template-columns:1fr} .clocks .hide-sm{display:none} .brand h1{font-size:24px} }
 
   .panel{background:var(--panel);border:1px solid var(--line);border-radius:6px;overflow:hidden;display:flex;flex-direction:column}
@@ -61,7 +84,48 @@
   .tv .tradingview-widget-container,.tv .tradingview-widget-container__widget{height:100%;width:100%}
   .chart{height:620px}
   @media (max-width:700px){.chart{height:460px}}
-  .h-tech{height:430px}.h-mini{height:220px}.h-feed{height:520px}
+  .h-quote{height:96px}.h-tech{height:430px}.h-mini{height:220px}.h-feed{height:520px}.h-overlay{height:560px}
+  @media (max-width:700px){.h-overlay{height:460px}}
+
+  .chip{display:inline-block;font:600 10px var(--mono);letter-spacing:.12em;text-transform:uppercase;padding:3px 7px;border-radius:3px;border:1px solid var(--line);color:var(--muted);white-space:nowrap}
+  .chip.go{color:var(--ink);background:var(--gold);border-color:var(--gold)}
+  .chip.skip{color:var(--crimson);border-color:var(--crimson)}
+  .tag{display:inline-block;font:600 10px/1 var(--mono);letter-spacing:.1em;padding:4px 6px;border-radius:3px;white-space:nowrap}
+  .tag.bull{background:rgba(63,180,122,.16);color:var(--up)}
+  .tag.bear{background:rgba(224,72,92,.16);color:var(--down)}
+  .tag.flat{background:var(--panel-2);color:var(--muted)}
+
+  /* ---------- Sentiment ---------- */
+  .sent{display:grid;gap:18px}
+  .s-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+  .s-head h3{margin:0;font:600 11px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+  .s-verdict{font:900 26px/1 var(--display);letter-spacing:.04em;text-transform:uppercase}
+  .s-verdict.bull{color:var(--up)} .s-verdict.bear{color:var(--down)} .s-verdict.flat{color:var(--gold-hi)}
+  .meter{display:flex;height:12px;border-radius:6px;overflow:hidden;background:var(--panel-2);margin-top:8px}
+  .meter .l{background:var(--up);transition:width .6s ease}
+  .meter .r{background:var(--down);transition:width .6s ease}
+  .meter.off .l,.meter.off .r{background:var(--line)}
+  .m-legend{display:flex;justify-content:space-between;margin-top:6px;font:600 12px var(--mono);font-variant-numeric:tabular-nums}
+  .m-legend .u{color:var(--up)} .m-legend .d{color:var(--down)}
+  .s-note{margin:6px 0 0;font-size:12px;color:var(--muted);max-width:60ch}
+
+  /* ---------- News list ---------- */
+  .news-tools{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+  .fbtn{background:var(--panel-2);border:1px solid var(--line);border-radius:3px;padding:4px 8px;font:600 11px var(--mono);letter-spacing:.06em;color:var(--muted)}
+  .fbtn[aria-pressed="true"]{border-color:var(--gold);color:var(--gold-hi)}
+  .refresh{background:none;border:1px solid var(--gold);color:var(--gold-hi);border-radius:3px;padding:4px 9px;font:600 11px var(--mono)}
+  .refresh[disabled]{opacity:.5;cursor:default}
+  .news{list-style:none;margin:0;padding:0;max-height:720px;overflow-y:auto}
+  .news li{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;padding:12px 14px;border-bottom:1px solid var(--line)}
+  .news li:last-child{border-bottom:0}
+  .n-time{grid-row:span 2;font:400 11px/1.4 var(--mono);color:var(--muted);text-align:right;min-width:56px;font-variant-numeric:tabular-nums}
+  .n-time b{display:block;color:var(--text);font-size:13px;font-weight:600}
+  .n-title{font-weight:500;color:var(--text);text-decoration:none;line-height:1.4}
+  .n-title:hover{color:var(--gold-hi)}
+  .n-take{display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:12px;color:var(--muted)}
+  .n-take .src{font:400 11px var(--mono)}
+  .news-state{padding:22px 14px;color:var(--muted);font-size:13px}
+  .news-foot{padding:8px 14px;border-top:1px solid var(--line);font:400 11px var(--mono);color:var(--muted)}
 
   /* ---------- Desk ---------- */
   .bias{display:flex;align-items:center;justify-content:space-between;gap:10px}
@@ -73,11 +137,10 @@
     padding:7px 10px;background:var(--panel-2);border-radius:4px;border-left:3px solid var(--line)}
   .levels li.r{border-left-color:var(--down)} .levels li.s{border-left-color:var(--up)} .levels li.p{border-left-color:var(--gold)}
   .levels .k{font:600 11px var(--mono);letter-spacing:.1em;color:var(--muted);width:30px}
-  .levels .n{color:var(--text)}
   .levels .v{font:600 14px var(--mono);font-variant-numeric:tabular-nums}
   .note{margin:12px 0 0;color:var(--muted);font-size:13px;max-width:65ch}
 
-  /* ---------- Sessions ---------- */
+  /* Sessions */
   .sess{display:grid;gap:8px}
   .s-row{display:grid;grid-template-columns:78px 1fr 84px;align-items:center;gap:10px;font-size:13px}
   .s-name{font:600 12px var(--mono);letter-spacing:.06em}
@@ -92,69 +155,90 @@
   .kz.active{border-color:var(--crimson);border-style:solid}
   .kz.active b{color:var(--crimson)}
   .kz span{font:400 11px var(--mono);color:var(--muted);text-align:right}
-
-  /* ---------- Close countdown ---------- */
   .cd{font:600 40px/1 var(--mono);font-variant-numeric:tabular-nums;color:var(--gold-hi);letter-spacing:.02em}
   .cd-sub{margin-top:6px;font:400 12px var(--mono);color:var(--muted)}
-  .chip{display:inline-block;font:600 10px var(--mono);letter-spacing:.12em;text-transform:uppercase;padding:3px 7px;border-radius:3px;border:1px solid var(--line);color:var(--muted)}
-  .chip.go{color:var(--ink);background:var(--gold);border-color:var(--gold)}
-  .chip.skip{color:var(--crimson);border-color:var(--crimson)}
 
-  /* ---------- Calculator ---------- */
-  .calc{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
-  @media (max-width:900px){.calc{grid-template-columns:1fr 1fr}}
+  /* Inputs */
   .fld{display:grid;gap:4px}
   .fld label{font:600 11px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
-  .fld input{background:var(--panel-2);border:1px solid var(--line);color:var(--text);border-radius:4px;
+  .fld input,.fld select{background:var(--panel-2);border:1px solid var(--line);color:var(--text);border-radius:4px;
     padding:9px 10px;font:600 15px var(--mono);font-variant-numeric:tabular-nums;width:100%}
-  .fld input:focus{border-color:var(--gold);outline:none}
+  .fld select{font:500 14px var(--body)}
+  .fld input:focus,.fld select:focus{border-color:var(--gold);outline:none}
+
+  /* Calculator */
+  .calc{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
   .out{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:14px;padding-top:14px;border-top:1px solid var(--line)}
-  @media (max-width:900px){.out{grid-template-columns:1fr 1fr}}
+  @media (max-width:900px){.calc,.out{grid-template-columns:1fr 1fr}}
   .o small{display:block;font:600 11px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
   .o b{font:600 22px var(--mono);font-variant-numeric:tabular-nums}
   .o b.lot{color:var(--gold-hi)} .o b.risk{color:var(--down)} .o b.rew{color:var(--up)}
   .calc-note{margin:12px 0 0;font-size:12px;color:var(--muted);max-width:75ch}
 
-  /* ---------- Dollar vs Gold + News Effect ---------- */
-  .fx-row{display:grid;gap:14px;margin-top:14px;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr)}
-  @media (max-width:1100px){.fx-row{grid-template-columns:1fr}}
-  .h-overlay{height:560px}
-  @media (max-width:700px){.h-overlay{height:460px}}
+  /* Gold vs Dollar key */
   .inv-key{display:flex;gap:14px;flex-wrap:wrap;padding:10px 14px;border-top:1px solid var(--line);font:400 12px var(--mono);color:var(--muted)}
   .inv-key b{font-weight:600}
   .sw{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px;vertical-align:-1px}
 
+  /* News effect */
   .ne-form{display:grid;grid-template-columns:minmax(0,1.6fr) repeat(2,minmax(0,1fr));gap:12px}
   @media (max-width:560px){.ne-form{grid-template-columns:1fr 1fr}.ne-form .fld:first-child{grid-column:1/-1}}
-  .fld select{background:var(--panel-2);border:1px solid var(--line);color:var(--text);border-radius:4px;
-    padding:9px 10px;font:500 14px var(--body);width:100%}
-  .fld select:focus{border-color:var(--gold);outline:none}
   .ne-result{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
   .ne-card{background:var(--panel-2);border-radius:5px;padding:12px 14px;border-top:3px solid var(--line)}
   .ne-card small{display:block;font:600 11px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
-  .ne-card b{display:block;margin-top:4px;font:900 28px/1 var(--display);letter-spacing:.04em;text-transform:uppercase}
+  .ne-card b{display:block;margin-top:4px;font:900 26px/1 var(--display);letter-spacing:.04em;text-transform:uppercase}
   .ne-card span{display:block;margin-top:6px;font-size:12px;color:var(--muted)}
   .ne-card.up{border-top-color:var(--up)} .ne-card.up b{color:var(--up)}
   .ne-card.down{border-top-color:var(--down)} .ne-card.down b{color:var(--down)}
   .ne-card.flat b{color:var(--gold-hi)}
   .ne-read{margin:12px 0 0;font-size:13px;max-width:65ch}
   .ne-read strong{color:var(--gold-hi);font-weight:600}
-
   .cheat-wrap{overflow-x:auto;margin-top:16px;border-top:1px solid var(--line);padding-top:12px}
-  table.cheat{width:100%;border-collapse:collapse;font-size:13px;min-width:420px}
+  table.cheat{width:100%;border-collapse:collapse;font-size:13px;min-width:400px}
   .cheat th{text-align:left;font:600 10px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);padding:6px 8px;border-bottom:1px solid var(--line)}
   .cheat td{padding:7px 8px;border-bottom:1px solid rgba(42,37,27,.6);vertical-align:middle}
   .cheat td.c{text-align:center;font:600 13px var(--mono);white-space:nowrap}
   .cheat .u{color:var(--up)} .cheat .d{color:var(--down)}
   .imp{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:1px}
   .imp.hi{background:var(--crimson)} .imp.md{background:var(--gold)}
+  .cheat tr{cursor:pointer}
   .cheat tr.sel td{background:rgba(212,166,74,.08)}
   .caveat{margin:12px 0 0;font-size:12px;color:var(--muted);max-width:75ch}
+
+  /* ---------- Start trading ---------- */
+  .cta-btn{display:inline-flex;align-items:center;gap:6px;background:var(--gold);color:var(--ink);text-decoration:none;
+    font:800 14px/1 var(--display);letter-spacing:.1em;text-transform:uppercase;padding:8px 12px;border-radius:3px}
+  .cta-btn:hover{background:var(--gold-hi)}
+  .join{margin-bottom:14px;scroll-margin-top:180px;border-color:rgba(212,166,74,.45);
+    background:linear-gradient(120deg,rgba(212,166,74,.12),rgba(200,40,60,.06) 60%,transparent),var(--panel)}
+  .join-in{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,2fr);gap:18px;padding:16px;align-items:center}
+  @media (max-width:900px){.join-in{grid-template-columns:1fr}}
+  .join h2{margin:0;font:900 30px/1 var(--display);letter-spacing:.03em;text-transform:uppercase}
+  .join h2 span{color:var(--gold)}
+  .join p{margin:8px 0 0;color:var(--muted);font-size:13px;max-width:48ch}
+  .j-actions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+  @media (max-width:700px){.j-actions{grid-template-columns:1fr}}
+  .j-card{display:flex;flex-direction:column;gap:10px;background:var(--panel-2);border:1px solid var(--line);border-radius:5px;padding:14px}
+  .j-card h3{margin:0;font:800 16px/1.1 var(--display);letter-spacing:.08em;text-transform:uppercase;color:var(--gold-hi)}
+  .j-card .sub{font-size:12px;color:var(--muted);flex:1}
+  .j-logo{height:28px;display:flex;align-items:center}
+  .j-logo img{max-height:28px;max-width:140px}
+  .j-logo .wm{font:600 20px/1 var(--body);letter-spacing:-.01em;color:var(--text)}
+  .j-go{display:flex;justify-content:center;align-items:center;gap:6px;text-align:center;text-decoration:none;border-radius:3px;padding:10px 12px;
+    font:800 14px/1 var(--display);letter-spacing:.1em;text-transform:uppercase;background:var(--gold);color:var(--ink)}
+  .j-go:hover{background:var(--gold-hi)}
+  .j-go.ghost{background:none;border:1px solid var(--gold);color:var(--gold-hi)}
+  .j-go.ghost:hover{background:rgba(212,166,74,.1)}
+  .j-go.off{background:none;border:1px dashed var(--line);color:var(--muted);pointer-events:none}
+  .ref{display:flex;align-items:center;gap:8px;background:var(--ink);border:1px dashed var(--gold);border-radius:3px;padding:6px 6px 6px 10px}
+  .ref code{flex:1;font:600 14px var(--mono);color:var(--gold-hi);letter-spacing:.06em;overflow:hidden;text-overflow:ellipsis;user-select:all}
+  .ref button{background:var(--panel-2);border:1px solid var(--line);border-radius:3px;padding:4px 8px;font:600 11px var(--mono);color:var(--text)}
+  .join p.risk-note{max-width:none;margin:0;padding:10px 16px;border-top:1px solid var(--line);font-size:11px;color:var(--muted)}
 
   footer{margin-top:24px;padding-top:16px;border-top:1px solid var(--line);display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;
     color:var(--muted);font-size:12px}
   footer strong{font:800 14px var(--display);letter-spacing:.12em;color:var(--gold);text-transform:uppercase}
-  @media (prefers-reduced-motion:reduce){.live i{animation:none}}
+  @media (prefers-reduced-motion:reduce){.live i{animation:none}.flash-track{animation:none}.flash-view{overflow-x:auto}.meter .l,.meter .r{transition:none}}
 </style>
 </head>
 <body>
@@ -172,21 +256,164 @@
       <div>NEW YORK <b id="clk-ny">--:--</b></div>
     </div>
     <a class="handle" id="handle" href="https://www.instagram.com/nibzthetrader/" target="_blank" rel="noopener">@nibzthetrader</a>
+    <a class="cta-btn" href="#pulse" id="hdr-start">Start trading</a>
+  </div>
+  <div class="flash">
+    <div class="flash-lbl">Flash</div>
+    <div class="flash-view"><div class="flash-track" id="flash"><span class="fl-empty">Loading latest gold and USD headlines…</span></div></div>
+  </div>
+  <div class="tabs-line">
+    <nav class="tabs" role="tablist" aria-label="Dashboard sections">
+      <button class="tab" role="tab" id="tab-pulse" aria-controls="view-pulse" aria-selected="true" data-view="pulse">Pulse</button>
+      <button class="tab" role="tab" id="tab-charts" aria-controls="view-charts" aria-selected="false" data-view="charts">Charts</button>
+      <button class="tab" role="tab" id="tab-desk" aria-controls="view-desk" aria-selected="false" data-view="desk">Desk</button>
+    </nav>
   </div>
 </header>
 
-<!-- Ticker tape -->
-<div class="tape"><div class="tv" id="w-tape"></div></div>
+<!-- ===================== PULSE ===================== -->
+<main>
+<section class="view" id="view-pulse" role="tabpanel" aria-labelledby="tab-pulse">
+  <section class="panel join" id="join" aria-labelledby="join-h">
+    <div class="join-in">
+      <div>
+        <h2 id="join-h">Trade gold <span>with Nibz</span></h2>
+        <p>Open your broker account with my referral code, join the signals community for XAU/USD setups, and follow the daily breakdowns on Instagram.</p>
+      </div>
+      <div class="j-actions">
+        <div class="j-card">
+          <div class="j-logo" id="ex-logo"><span class="wm">Exness</span></div>
+          <div class="sub">Open a live or demo account for XAU/USD.</div>
+          <div class="ref"><code id="ex-code">—</code><button id="ex-copy" type="button">Copy</button></div>
+          <a class="j-go" id="ex-link" target="_blank" rel="noopener sponsored">Open account</a>
+        </div>
+        <div class="j-card">
+          <h3>WhatsApp signals</h3>
+          <div class="sub" id="com-sub">Gold setups, entries, SL and TP, and live session updates.</div>
+          <a class="j-go ghost" id="com-link" target="_blank" rel="noopener">Join community</a>
+        </div>
+        <div class="j-card">
+          <h3>Instagram</h3>
+          <div class="sub">Daily bias, chart breakdowns and trade recaps.</div>
+          <a class="j-go ghost" id="ig-link" target="_blank" rel="noopener">@nibzthetrader</a>
+        </div>
+      </div>
+    </div>
+    <p class="risk-note">Referral link: I may earn a commission if you open an account. Trading gold CFDs with leverage carries a high risk of losing money quickly. Signals are education, not financial advice. Only trade money you can afford to lose.</p>
+  </section>
 
-<div class="grid">
-  <!-- Main chart -->
+  <div class="quotes">
+    <div class="panel"><div class="tv h-quote" id="q-xau"></div></div>
+    <div class="panel"><div class="tv h-quote" id="q-dxy"></div></div>
+    <div class="panel"><div class="tv h-quote" id="q-10y"></div></div>
+    <div class="panel"><div class="tv h-quote" id="q-xag"></div></div>
+  </div>
+
+  <div class="pulse-grid">
+    <!-- News & takeaways -->
+    <section class="panel">
+      <div class="ph">
+        <h2>News &amp; Takeaways</h2>
+        <div class="news-tools">
+          <button class="fbtn" data-f="all" aria-pressed="true">All</button>
+          <button class="fbtn" data-f="bull" aria-pressed="false">Gold ▲</button>
+          <button class="fbtn" data-f="bear" aria-pressed="false">Gold ▼</button>
+          <button class="refresh" id="refresh">↻ Refresh</button>
+        </div>
+      </div>
+      <ul class="news" id="news"><li class="news-state">Connecting to news feeds…</li></ul>
+      <div class="news-foot" id="news-foot">Auto-refresh every 3 minutes</div>
+    </section>
+
+    <div class="col">
+      <!-- Sentiment -->
+      <section class="panel">
+        <div class="ph"><h2>Sentiment</h2><small id="sent-count">—</small></div>
+        <div class="pb sent">
+          <div>
+            <div class="s-head"><h3>News bias for gold</h3><span class="s-verdict flat" id="s-verdict">Analysing</span></div>
+            <div class="meter" id="m-news"><span class="l" style="width:50%"></span><span class="r" style="width:50%"></span></div>
+            <div class="m-legend"><span class="u" id="m-bull">Bullish 50%</span><span class="d" id="m-bear">Bearish 50%</span></div>
+            <p class="s-note">Scored from the last 24 hours of gold and USD headlines on this page. A quick read of the news flow, not a forecast.</p>
+          </div>
+          <div>
+            <div class="s-head"><h3>Retail positions</h3><span class="s-verdict flat" id="r-verdict">Not set</span></div>
+            <div class="meter" id="m-retail"><span class="l" style="width:50%"></span><span class="r" style="width:50%"></span></div>
+            <div class="m-legend"><span class="u" id="r-long">Long —</span><span class="d" id="r-short">Short —</span></div>
+            <p class="s-note" id="r-note"></p>
+          </div>
+        </div>
+      </section>
+
+      <!-- News effect -->
+      <section class="panel">
+        <div class="ph"><h2>News Effect</h2><small>USD ↑ = Gold ↓</small></div>
+        <div class="pb">
+          <div class="ne-form">
+            <div class="fld"><label for="ne-ev">Event</label><select id="ne-ev"></select></div>
+            <div class="fld"><label for="ne-fc">Forecast</label><input id="ne-fc" type="number" step="0.01" value="0.3"></div>
+            <div class="fld"><label for="ne-ac">Actual</label><input id="ne-ac" type="number" step="0.01" value="0.4"></div>
+          </div>
+          <div class="ne-result">
+            <div class="ne-card" id="ne-usd"><small>US Dollar</small><b>—</b><span></span></div>
+            <div class="ne-card" id="ne-gold"><small>Gold (XAU/USD)</small><b>—</b><span></span></div>
+          </div>
+          <p class="ne-read" id="ne-read"></p>
+          <div class="cheat-wrap">
+            <table class="cheat">
+              <thead><tr><th>Event</th><th>If actual beats forecast</th><th class="c">USD</th><th class="c">Gold</th></tr></thead>
+              <tbody id="cheat"></tbody>
+            </table>
+          </div>
+          <p class="caveat">The usual first reaction, not a guarantee. In risk-off panics gold and the dollar can rise together, and moves can reverse within minutes. Spreads widen at release time.</p>
+        </div>
+      </section>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== CHARTS ===================== -->
+<section class="view" id="view-charts" role="tabpanel" aria-labelledby="tab-charts" hidden>
   <section class="panel">
     <div class="ph"><h2>XAU/USD · M15</h2><small>OANDA feed · Dubai time</small></div>
     <div class="tv chart" id="w-chart"></div>
   </section>
 
-  <div class="col">
-    <!-- Nibz desk -->
+  <section class="panel" style="margin-top:14px">
+    <div class="ph"><h2>Gold vs Dollar</h2><small>XAU/USD over DXY · H1</small></div>
+    <div class="tv h-overlay" id="w-overlay"></div>
+    <div class="inv-key">
+      <span><i class="sw" style="background:var(--gold)"></i><b>Gold</b> top pane</span>
+      <span><i class="sw" style="background:#5B8DEF"></i><b>DXY</b> bottom pane</span>
+      <span>Dollar up usually means gold down, and the reverse</span>
+    </div>
+  </section>
+
+  <div class="row3">
+    <section class="panel">
+      <div class="ph"><h2>Technical Gauge</h2><small>XAU/USD</small></div>
+      <div class="tv h-tech" id="w-tech"></div>
+    </section>
+    <div class="col">
+      <section class="panel">
+        <div class="ph"><h2>Dollar Index</h2><small>DXY · 1D</small></div>
+        <div class="tv h-mini" id="w-dxy"></div>
+      </section>
+      <section class="panel">
+        <div class="ph"><h2>US 10Y Yield</h2><small>US10Y · 1D</small></div>
+        <div class="tv h-mini" id="w-10y"></div>
+      </section>
+    </div>
+    <section class="panel">
+      <div class="ph"><h2>Gold vs Silver</h2><small>XAG/USD · 1M</small></div>
+      <div class="tv h-tech" id="w-xag"></div>
+    </section>
+  </div>
+</section>
+
+<!-- ===================== DESK ===================== -->
+<section class="view" id="view-desk" role="tabpanel" aria-labelledby="tab-desk" hidden>
+  <div class="row3" style="margin-top:0">
     <section class="panel">
       <div class="ph"><h2>Nibz Desk</h2><small id="desk-upd"></small></div>
       <div class="pb">
@@ -201,8 +428,6 @@
         <p class="note" id="desk-note"></p>
       </div>
     </section>
-
-    <!-- Sessions -->
     <section class="panel">
       <div class="ph"><h2>Sessions</h2><small>auto DST</small></div>
       <div class="pb">
@@ -210,8 +435,6 @@
         <div class="kz" id="kz"><b id="kz-name">—</b><span id="kz-time"></span></div>
       </div>
     </section>
-
-    <!-- Daily close -->
     <section class="panel">
       <div class="ph"><h2>Daily Close</h2><span class="chip" id="cd-chip">—</span></div>
       <div class="pb">
@@ -220,110 +443,52 @@
       </div>
     </section>
   </div>
-</div>
 
-<div class="row3">
-  <section class="panel">
-    <div class="ph"><h2>Technical Gauge</h2><small>XAU/USD</small></div>
-    <div class="tv h-tech" id="w-tech"></div>
-  </section>
-  <div class="col">
+  <div class="row2">
     <section class="panel">
-      <div class="ph"><h2>Dollar Index</h2><small>DXY</small></div>
-      <div class="tv h-mini" id="w-dxy"></div>
+      <div class="ph"><h2>USD Calendar</h2><small>medium + high impact</small></div>
+      <div class="tv h-feed" id="w-cal"></div>
     </section>
     <section class="panel">
-      <div class="ph"><h2>US 10Y Yield</h2><small>US10Y</small></div>
-      <div class="tv h-mini" id="w-10y"></div>
+      <div class="ph"><h2>TradingView Gold News</h2><small>backup feed</small></div>
+      <div class="tv h-feed" id="w-news"></div>
     </section>
   </div>
-  <section class="panel">
-    <div class="ph"><h2>Gold vs Silver</h2><small>XAG/USD</small></div>
-    <div class="tv h-tech" id="w-xag"></div>
-  </section>
-</div>
 
-<div class="fx-row">
-  <!-- Gold vs Dollar overlay -->
-  <section class="panel">
-    <div class="ph"><h2>Gold vs Dollar</h2><small>XAU/USD over DXY · H1</small></div>
-    <div class="tv h-overlay" id="w-overlay"></div>
-    <div class="inv-key">
-      <span><i class="sw" style="background:var(--gold)"></i><b>Gold</b> top pane</span>
-      <span><i class="sw" style="background:#5B8DEF"></i><b>DXY</b> bottom pane</span>
-      <span>Dollar up usually means gold down, and the reverse</span>
-    </div>
-  </section>
-
-  <!-- News Effect -->
-  <section class="panel">
-    <div class="ph"><h2>News Effect</h2><small>USD ↑ = Gold ↓</small></div>
+  <section class="panel" style="margin-top:14px">
+    <div class="ph"><h2>Gold Lot Calculator</h2><small>Exness pip = $0.01</small></div>
     <div class="pb">
-      <div class="ne-form">
-        <div class="fld"><label for="ne-ev">Event</label><select id="ne-ev"></select></div>
-        <div class="fld"><label for="ne-fc">Forecast</label><input id="ne-fc" type="number" step="0.01" value="0.3"></div>
-        <div class="fld"><label for="ne-ac">Actual</label><input id="ne-ac" type="number" step="0.01" value="0.4"></div>
+      <div class="calc">
+        <div class="fld"><label for="c-bal">Balance (USD)</label><input id="c-bal" type="number" min="0" step="10" value="1000"></div>
+        <div class="fld"><label for="c-risk">Risk %</label><input id="c-risk" type="number" min="0" step="0.1" value="1"></div>
+        <div class="fld"><label for="c-sl">Stop loss (pips)</label><input id="c-sl" type="number" min="1" step="10" value="500"></div>
+        <div class="fld"><label for="c-tp">Take profit (pips)</label><input id="c-tp" type="number" min="0" step="10" value="1000"></div>
       </div>
-      <div class="ne-result">
-        <div class="ne-card" id="ne-usd"><small>US Dollar</small><b>—</b><span></span></div>
-        <div class="ne-card" id="ne-gold"><small>Gold (XAU/USD)</small><b>—</b><span></span></div>
+      <div class="out">
+        <div class="o"><small>Lot size</small><b class="lot" id="o-lot">—</b></div>
+        <div class="o"><small>Risk</small><b class="risk" id="o-risk">—</b></div>
+        <div class="o"><small>Reward</small><b class="rew" id="o-rew">—</b></div>
+        <div class="o"><small>R : R</small><b id="o-rr">—</b></div>
       </div>
-      <p class="ne-read" id="ne-read"></p>
-
-      <div class="cheat-wrap">
-        <table class="cheat">
-          <thead><tr><th>Event</th><th>If actual beats forecast</th><th class="c">USD</th><th class="c">Gold</th></tr></thead>
-          <tbody id="cheat"></tbody>
-        </table>
-      </div>
-      <p class="caveat">This is the usual first reaction, not a guarantee. In risk-off panics gold and the dollar can rise together, and a move can reverse within minutes once the market reads the details. Spreads widen at release time, so size down or wait for the first M15 candle to close.</p>
+      <p class="calc-note">1.00 lot = 100 oz, so each $0.01 move (1 pip on Exness) is $1 per lot, and 0.01 lot is $0.01 per pip. A 500-pip stop is a $5.00 move in price. Lot is rounded down to 0.01.</p>
     </div>
   </section>
-</div>
-
-<div class="row2">
-  <section class="panel">
-    <div class="ph"><h2>Gold News</h2><small>live headlines</small></div>
-    <div class="tv h-feed" id="w-news"></div>
-  </section>
-  <section class="panel">
-    <div class="ph"><h2>USD Calendar</h2><small>medium + high impact</small></div>
-    <div class="tv h-feed" id="w-cal"></div>
-  </section>
-</div>
-
-<!-- Lot calculator -->
-<section class="panel" style="margin-top:14px">
-  <div class="ph"><h2>Gold Lot Calculator</h2><small>Exness pip = $0.01</small></div>
-  <div class="pb">
-    <div class="calc">
-      <div class="fld"><label for="c-bal">Balance (USD)</label><input id="c-bal" type="number" min="0" step="10" value="1000"></div>
-      <div class="fld"><label for="c-risk">Risk %</label><input id="c-risk" type="number" min="0" step="0.1" value="1"></div>
-      <div class="fld"><label for="c-sl">Stop loss (pips)</label><input id="c-sl" type="number" min="1" step="10" value="500"></div>
-      <div class="fld"><label for="c-tp">Take profit (pips)</label><input id="c-tp" type="number" min="0" step="10" value="1000"></div>
-    </div>
-    <div class="out">
-      <div class="o"><small>Lot size</small><b class="lot" id="o-lot">—</b></div>
-      <div class="o"><small>Risk</small><b class="risk" id="o-risk">—</b></div>
-      <div class="o"><small>Reward</small><b class="rew" id="o-rew">—</b></div>
-      <div class="o"><small>R : R</small><b id="o-rr">—</b></div>
-    </div>
-    <p class="calc-note">1.00 lot = 100 oz, so each $0.01 move (1 pip on Exness) is $1 per lot, and 0.01 lot is $0.01 per pip. A 500-pip stop is a $5.00 move in price. Lot is rounded down to 0.01.</p>
-  </div>
 </section>
+</main>
 
 <footer>
   <div><strong>Nibz the Trader</strong> · XAU/USD live desk</div>
-  <div>Market data and charts by TradingView. Education only, not financial advice. Trade with a stop loss.</div>
+  <div>Charts and quotes by TradingView. Headlines from FXStreet and other public feeds. Education only, not financial advice.</div>
 </footer>
 </div>
 
 <script>
 /* =====================================================================
-   EDIT THIS BLOCK to update your desk. Commit to GitHub and the site
-   updates within a minute.
+   EDIT THIS BLOCK to update your desk. Upload the file to GitHub and
+   the site updates within a minute.
    bias: "Bullish" | "Bearish" | "Neutral"
-   levels type: "r" resistance, "s" support, "p" pivot / key zone
+   levels type: "r" resistance, "s" support, "p" key zone
+   retail.long: % of retail traders long (e.g. 62). Leave null to hide.
    ===================================================================== */
 const CONFIG = {
   bias: "Neutral",
@@ -335,80 +500,330 @@ const CONFIG = {
     { type:"s", name:"Example: Daily demand",     price:"0000.00" }
   ],
   note: "Edit CONFIG in index.html to post today's bias, levels and plan.",
+  retail: { long: null, source: "Myfxbook", updated: "" },
   instagram: "https://www.instagram.com/nibzthetrader/",
-  // Show the Mon–Thu entry window before the NY close (skips Friday)
+  // Start trading section
+  exness: {
+    link: "https://one.exnessonelink.com/a/7yku7mpcgx",
+    code: "7yku7mpcgx",
+    logo: "exness-logo.png"   // upload the official logo to the repo with this exact name; text shows until then
+  },
+  community: {
+    label: "Join on WhatsApp",
+    link: "https://chat.whatsapp.com/IzDAsIS3AqB1LRSD5Ob0LI"
+  },
   showCloseWindow: true
 };
 /* ===================================================================== */
 
 const TZ = "Asia/Dubai";
+const $ = id => document.getElementById(id);
 
-/* ---------- TradingView widgets ---------- */
+/* ---------- TradingView widgets (loaded per tab) ---------- */
 function tv(id, file, cfg){
-  const host = document.getElementById(id);
-  const box = document.createElement("div");
-  box.className = "tradingview-widget-container";
-  const inner = document.createElement("div");
-  inner.className = "tradingview-widget-container__widget";
+  const host = $(id); if (!host || host.dataset.loaded) return;
+  host.dataset.loaded = "1";
+  const box = document.createElement("div"); box.className = "tradingview-widget-container";
+  const inner = document.createElement("div"); inner.className = "tradingview-widget-container__widget";
   box.appendChild(inner);
-  const s = document.createElement("script");
-  s.type = "text/javascript"; s.async = true;
+  const s = document.createElement("script"); s.type = "text/javascript"; s.async = true;
   s.src = "https://s3.tradingview.com/external-embedding/embed-widget-" + file + ".js";
   s.innerHTML = JSON.stringify(cfg);
-  box.appendChild(s);
-  host.appendChild(box);
+  box.appendChild(s); host.appendChild(box);
 }
 const base = { locale:"en", colorTheme:"dark", isTransparent:true };
+const mini = sym => ({ ...base, symbol:sym, width:"100%", height:"100%", dateRange:"1D", trendLineColor:"#D4A64A", underLineColor:"rgba(212,166,74,0.12)" });
+const quote = sym => ({ ...base, symbol:sym, width:"100%" });
 
-tv("w-tape","ticker-tape",{ ...base, displayMode:"adaptive", showSymbolLogo:true, symbols:[
-  {proName:"OANDA:XAUUSD",title:"Gold"},
-  {proName:"OANDA:XAGUSD",title:"Silver"},
-  {proName:"TVC:DXY",title:"DXY"},
-  {proName:"TVC:US10Y",title:"US 10Y"},
-  {proName:"FX:EURUSD",title:"EUR/USD"},
-  {proName:"FX:USDJPY",title:"USD/JPY"},
-  {proName:"TVC:USOIL",title:"WTI"},
-  {proName:"BITSTAMP:BTCUSD",title:"BTC"}
-]});
+const WIDGETS = {
+  pulse: [
+    ["q-xau","single-quote",quote("OANDA:XAUUSD")],
+    ["q-dxy","single-quote",quote("TVC:DXY")],
+    ["q-10y","single-quote",quote("TVC:US10Y")],
+    ["q-xag","single-quote",quote("OANDA:XAGUSD")]
+  ],
+  charts: [
+    ["w-chart","advanced-chart",{ autosize:true, symbol:"OANDA:XAUUSD", interval:"15", timezone:TZ, theme:"dark", style:"1", locale:"en",
+      backgroundColor:"#14120E", gridColor:"rgba(42,37,27,0.6)", allow_symbol_change:true, withdateranges:true, details:false,
+      support_host:"https://www.tradingview.com" }],
+    ["w-overlay","advanced-chart",{ autosize:true, symbol:"OANDA:XAUUSD", interval:"60", timezone:TZ, theme:"dark", style:"1", locale:"en",
+      backgroundColor:"#14120E", gridColor:"rgba(42,37,27,0.6)", allow_symbol_change:false, hide_side_toolbar:true, details:false,
+      compareSymbols:[{ symbol:"TVC:DXY", position:"NewPane" }], support_host:"https://www.tradingview.com" }],
+    ["w-tech","technical-analysis",{ ...base, interval:"15m", width:"100%", height:"100%", symbol:"OANDA:XAUUSD", showIntervalTabs:true, displayMode:"single" }],
+    ["w-dxy","mini-symbol-overview",mini("TVC:DXY")],
+    ["w-10y","mini-symbol-overview",mini("TVC:US10Y")],
+    ["w-xag","mini-symbol-overview",{ ...mini("OANDA:XAGUSD"), dateRange:"1M" }]
+  ],
+  desk: [
+    ["w-cal","events",{ ...base, width:"100%", height:"100%", importanceFilter:"0,1", countryFilter:"us" }],
+    ["w-news","timeline",{ ...base, feedMode:"symbol", symbol:"OANDA:XAUUSD", displayMode:"regular", width:"100%", height:"100%" }]
+  ]
+};
 
-tv("w-chart","advanced-chart",{
-  autosize:true, symbol:"OANDA:XAUUSD", interval:"15", timezone:TZ,
-  theme:"dark", style:"1", locale:"en", backgroundColor:"#14120E",
-  gridColor:"rgba(42,37,27,0.6)", allow_symbol_change:true,
-  hide_side_toolbar:false, withdateranges:true, details:false,
-  studies:["STD;Session%1Volume"], support_host:"https://www.tradingview.com"
-});
-
-tv("w-tech","technical-analysis",{ ...base, interval:"15m", width:"100%", height:"100%",
-  symbol:"OANDA:XAUUSD", showIntervalTabs:true, displayMode:"single" });
-
-tv("w-dxy","mini-symbol-overview",{ ...base, symbol:"TVC:DXY", width:"100%", height:"100%", dateRange:"1D", trendLineColor:"#D4A64A", underLineColor:"rgba(212,166,74,0.12)" });
-tv("w-10y","mini-symbol-overview",{ ...base, symbol:"TVC:US10Y", width:"100%", height:"100%", dateRange:"1D", trendLineColor:"#D4A64A", underLineColor:"rgba(212,166,74,0.12)" });
-tv("w-xag","mini-symbol-overview",{ ...base, symbol:"OANDA:XAGUSD", width:"100%", height:"100%", dateRange:"1M", trendLineColor:"#D4A64A", underLineColor:"rgba(212,166,74,0.12)" });
-
-tv("w-news","timeline",{ ...base, feedMode:"symbol", symbol:"OANDA:XAUUSD", displayMode:"regular", width:"100%", height:"100%" });
-tv("w-cal","events",{ ...base, width:"100%", height:"100%", importanceFilter:"0,1", countryFilter:"us" });
+/* ---------- Tabs ---------- */
+const VIEWS = ["pulse","charts","desk"];
+function show(view){
+  if (!VIEWS.includes(view)) view = "pulse";
+  VIEWS.forEach(v=>{
+    $("view-"+v).hidden = v!==view;
+    $("tab-"+v).setAttribute("aria-selected", v===view ? "true" : "false");
+  });
+  WIDGETS[view].forEach(w=>tv(...w));
+  try{ localStorage.setItem("nibz-tab",view); }catch(e){}
+}
+document.querySelectorAll(".tab").forEach(b=>b.addEventListener("click",()=>{ show(b.dataset.view); history.replaceState(null,"","#"+b.dataset.view); }));
+let startView = (location.hash||"").slice(1);
+if (!VIEWS.includes(startView)){ try{ startView = localStorage.getItem("nibz-tab") || "pulse"; }catch(e){ startView = "pulse"; } }
+show(startView);
 
 /* ---------- Desk ---------- */
 (function desk(){
-  const b = document.getElementById("bias");
-  const k = (CONFIG.bias||"Neutral").toLowerCase();
+  const b = $("bias"), k = (CONFIG.bias||"Neutral").toLowerCase();
   b.textContent = CONFIG.bias || "Neutral";
   b.className = "bias-tag " + (k.startsWith("bull")?"bull":k.startsWith("bear")?"bear":"neutral");
-  document.getElementById("bias-tf").textContent = CONFIG.biasTimeframe || "";
-  document.getElementById("desk-upd").textContent = CONFIG.updated ? "Updated " + CONFIG.updated : "";
-  const ul = document.getElementById("levels");
+  $("bias-tf").textContent = CONFIG.biasTimeframe || "";
+  $("desk-upd").textContent = CONFIG.updated ? "Updated " + CONFIG.updated : "";
   const labels = {r:"RES",s:"SUP",p:"KEY"};
   (CONFIG.levels||[]).forEach(l=>{
     const li = document.createElement("li"); li.className = l.type||"p";
     const a = document.createElement("span"); a.className="k"; a.textContent = labels[l.type]||"KEY";
-    const n = document.createElement("span"); n.className="n"; n.textContent = l.name||"";
+    const n = document.createElement("span"); n.textContent = l.name||"";
     const v = document.createElement("span"); v.className="v"; v.textContent = l.price||"";
-    li.append(a,n,v); ul.appendChild(li);
+    li.append(a,n,v); $("levels").appendChild(li);
   });
-  document.getElementById("desk-note").textContent = CONFIG.note || "";
-  if (CONFIG.instagram) document.getElementById("handle").href = CONFIG.instagram;
+  $("desk-note").textContent = CONFIG.note || "";
+  if (CONFIG.instagram) $("handle").href = CONFIG.instagram;
 })();
+
+/* ---------- Start trading ---------- */
+(function join(){
+  function setLink(el, url, label){
+    if (label) el.textContent = label;
+    if (url){ el.href = url; el.classList.remove("off"); el.removeAttribute("aria-disabled"); }
+    else { el.removeAttribute("href"); el.classList.add("off"); el.setAttribute("aria-disabled","true"); el.textContent = "Link coming soon"; }
+  }
+  const ex = CONFIG.exness || {};
+  setLink($("ex-link"), ex.link, "Open account");
+  $("ex-code").textContent = ex.code || "Code coming soon";
+  $("ex-copy").hidden = !ex.code;
+  if (ex.logo){
+    const img = document.createElement("img"); img.src = ex.logo; img.alt = "Exness";
+    img.onerror = ()=>{ $("ex-logo").textContent = ""; const w = document.createElement("span"); w.className = "wm"; w.textContent = "Exness"; $("ex-logo").appendChild(w); };
+    $("ex-logo").textContent = ""; $("ex-logo").appendChild(img);
+  }
+  $("ex-copy").addEventListener("click", async ()=>{
+    const b = $("ex-copy");
+    try { await navigator.clipboard.writeText(ex.code); b.textContent = "Copied"; }
+    catch(e){ const r = document.createRange(); r.selectNodeContents($("ex-code")); const s = getSelection(); s.removeAllRanges(); s.addRange(r); b.textContent = "Selected"; }
+    setTimeout(()=>{ b.textContent = "Copy"; }, 1800);
+  });
+  const com = CONFIG.community || {};
+  setLink($("com-link"), com.link, com.label || "Join community");
+  setLink($("ig-link"), CONFIG.instagram, "@nibzthetrader");
+  $("hdr-start").addEventListener("click", e=>{
+    e.preventDefault(); show("pulse"); history.replaceState(null,"","#pulse");
+    $("join").scrollIntoView({behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block:"start"});
+  });
+})();
+
+/* ---------- Retail positioning (manual) ---------- */
+(function retail(){
+  const r = CONFIG.retail || {};
+  const note = $("r-note"); note.textContent = "";
+  const link = document.createElement("a");
+  link.href = "https://www.myfxbook.com/community/outlook/XAUUSD"; link.target = "_blank"; link.rel = "noopener";
+  link.textContent = "Myfxbook gold outlook";
+  if (typeof r.long === "number" && r.long>=0 && r.long<=100){
+    const L = Math.round(r.long), S = 100-L;
+    $("m-retail").querySelector(".l").style.width = L+"%";
+    $("m-retail").querySelector(".r").style.width = S+"%";
+    $("r-long").textContent = "Long "+L+"%"; $("r-short").textContent = "Short "+S+"%";
+    const v = $("r-verdict");
+    if (L>=60){ v.textContent = "Crowd long"; v.className = "s-verdict bear"; }
+    else if (S>=60){ v.textContent = "Crowd short"; v.className = "s-verdict bull"; }
+    else { v.textContent = "Balanced"; v.className = "s-verdict flat"; }
+    note.append("Contrarian read: when most retail traders are on one side, price often moves the other way. Source: "+(r.source||"manual")+(r.updated?", "+r.updated:"")+". ");
+    note.append(link);
+  } else {
+    $("m-retail").classList.add("off");
+    note.append("Set retail.long in CONFIG from the ");
+    note.append(link);
+    note.append(" to show the crowd split.");
+  }
+})();
+
+/* ---------- News feeds ---------- */
+const FEEDS = [
+  { name:"FXStreet",      url:"https://www.fxstreet.com/rss/news" },
+  { name:"investingLive", url:"https://investinglive.com/feed/" },
+  { name:"CNBC",          url:"https://www.cnbc.com/id/20910258/device/rss/rss.html" }
+];
+const RELEVANT = /\b(gold|xau|bullion|precious|silver|dollar|usd|greenback|dxy|fed|fomc|powell|treasur\w*|yields?|cpi|pce|ppi|inflation|payrolls?|nfp|jobs|jobless|unemployment|gdp|tariffs?|geopolitic\w*|war|safe[- ]haven|rate (?:cut|hike)s?|us data|us economy)\b/i;
+
+function withTimeout(ms){ const c = new AbortController(); setTimeout(()=>c.abort(),ms); return c.signal; }
+function decode(s){ const t = document.createElement("textarea"); t.innerHTML = s||""; return t.value.trim(); }
+function parseRss2jsonDate(s){ return s ? new Date(s.replace(" ","T")+"Z") : null; }
+
+async function viaRss2json(f){
+  const r = await fetch("https://api.rss2json.com/v1/api.json?rss_url="+encodeURIComponent(f.url), {signal:withTimeout(10000)});
+  const j = await r.json();
+  if (j.status!=="ok" || !Array.isArray(j.items)) throw new Error("rss2json");
+  return j.items.map(i=>({ title:decode(i.title), link:i.link, t:parseRss2jsonDate(i.pubDate), src:f.name }));
+}
+async function viaAllOrigins(f){
+  const r = await fetch("https://api.allorigins.win/raw?url="+encodeURIComponent(f.url), {signal:withTimeout(10000)});
+  if (!r.ok) throw new Error("allorigins");
+  const x = new DOMParser().parseFromString(await r.text(),"text/xml");
+  const items = [...x.querySelectorAll("item")];
+  if (!items.length) throw new Error("empty");
+  return items.map(it=>({ title:decode(it.querySelector("title")?.textContent), link:(it.querySelector("link")?.textContent||"").trim(),
+    t:new Date(it.querySelector("pubDate")?.textContent||""), src:f.name }));
+}
+async function loadFeed(f){
+  const res = await Promise.allSettled([viaRss2json(f), viaAllOrigins(f)]);
+  const ok = res.filter(r=>r.status==="fulfilled").map(r=>r.value);
+  if (!ok.length) return [];
+  return ok.sort((a,b)=>b.length-a.length)[0];
+}
+
+/* ---------- Headline scoring (gold direction) ---------- */
+const UP   = "(?:rise|rises|rising|rose|gain|gains|gained|climb|climbs|climbed|climbing|rall(?:y|ies|ied|ying)|jump|jumps|jumped|surge|surges|surged|soar|soars|soared|advance|advances|higher|record|records|firm|firms|firmer|rebound|rebounds|recover|recovers|strengthen|strengthens|stronger|extends? gains|up|bid|hits? (?:a )?(?:new )?high)";
+const DOWN = "(?:fall|falls|falling|fell|drop|drops|dropped|slide|slides|slid|decline|declines|declined|retreat|retreats|slip|slips|slipped|tumble|tumbles|plunge|plunges|sink|sinks|lower|weak|weaken|weakens|weaker|pare|pares|losses|down|sell-?off|offered|hits? (?:a )?(?:new )?low)";
+const near = (subj, verbs) => new RegExp("\\b(?:"+subj+")\\b(?:\\W+[\\w'/-]+){0,4}?\\W+"+verbs+"\\b","i");
+const GOLD = "gold|xau/usd|xauusd|xau|bullion|precious metals?";
+const USD  = "dollar|usd|greenback|dxy|us dollar index";
+const RULES = [
+  { re:near(GOLD,UP),   w: 2,   why:"Gold moving higher" },
+  { re:near(GOLD,DOWN), w:-2,   why:"Gold under pressure" },
+  { re:near(USD,UP),    w:-1.5, why:"Stronger dollar weighs on gold" },
+  { re:near(USD,DOWN),  w: 1.5, why:"Weaker dollar supports gold" },
+  { re:near("yields?",UP),   w:-1, why:"Rising yields weigh on gold" },
+  { re:near("yields?",DOWN), w: 1, why:"Falling yields support gold" },
+  { re:near("jobless claims|unemployment(?: rate)?",UP),   w: 1, why:"Softer US jobs data raises rate-cut bets" },
+  { re:near("jobless claims|unemployment(?: rate)?",DOWN), w:-1, why:"Firm US jobs data supports the dollar" },
+  { re:near("payrolls|nfp|jobs report|retail sales|gdp|cpi|pce|ppi|inflation","(?:beat|beats|hotter|hot|accelerat\\w*|surge\\w*|jump\\w*|rise\\w*|above|stronger|strong)"), w:-1, why:"Strong US data supports the dollar" },
+  { re:near("payrolls|nfp|jobs report|retail sales|gdp|cpi|pce|ppi|inflation","(?:miss|misses|cool\\w*|soft\\w*|slow\\w*|eases?|below|weaker|weak|fall\\w*|drop\\w*)"), w: 1, why:"Soft US data supports rate-cut bets" },
+  { re:/\b(safe[- ]haven|geopolitic\w*|war|conflict|escalat\w*|missile|airstrikes?|invasion|sanctions?)\b/i, w: 1, why:"Safe-haven demand supports gold" },
+  { re:/\b(ceasefire|truce|peace (?:deal|talks)|de-?escalat\w*)\b/i, w:-1, why:"Easing tensions cut safe-haven demand" }
+];
+const US_FED = /\b(fed|fomc|powell|u\.?s\.?|federal reserve|waller|williams|goolsbee|bowman|jefferson)\b/i;
+const FED_RULES = [
+  { re:/\b(hawkish|rate hikes?|hikes? rates|higher for longer|no rush to cut|pushes? back on cuts)\b/i, w:-1, why:"Hawkish Fed tone weighs on gold" },
+  { re:/\b(dovish|rate cuts?|cuts? rates|easing|pivot)\b/i, w: 1, why:"Dovish Fed tone supports gold" }
+];
+
+function score(title){
+  let text = title;
+  let s = 0; const hits = [];
+  // FX pairs first: EUR/USD up = USD down, USD/JPY up = USD up
+  const pairUp = new RegExp("\\b(?:eur|gbp|aud|nzd)/usd\\b(?:\\W+[\\w'/-]+){0,3}?\\W+"+UP+"\\b","i");
+  const pairDn = new RegExp("\\b(?:eur|gbp|aud|nzd)/usd\\b(?:\\W+[\\w'/-]+){0,3}?\\W+"+DOWN+"\\b","i");
+  const basUp  = new RegExp("\\busd/(?:jpy|chf|cad|cnh|mxn|inr)\\b(?:\\W+[\\w'/-]+){0,3}?\\W+"+UP+"\\b","i");
+  const basDn  = new RegExp("\\busd/(?:jpy|chf|cad|cnh|mxn|inr)\\b(?:\\W+[\\w'/-]+){0,3}?\\W+"+DOWN+"\\b","i");
+  if (pairUp.test(text)||basDn.test(text)){ s+=1; hits.push({w:1,why:"Weaker dollar supports gold"}); }
+  if (pairDn.test(text)||basUp.test(text)){ s-=1; hits.push({w:-1,why:"Stronger dollar weighs on gold"}); }
+  text = text.replace(/\b[a-z]{3}\/[a-z]{3}\b/gi," FXPAIR ");
+  RULES.forEach(r=>{ if (r.re.test(text)){ s+=r.w; hits.push(r); } });
+  if (US_FED.test(text)) FED_RULES.forEach(r=>{ if (r.re.test(text)){ s+=r.w; hits.push(r); } });
+  let tag = "flat", why = "Watch the USD reaction";
+  if (s>=1){ tag="bull"; why = hits.filter(h=>h.w>0).sort((a,b)=>b.w-a.w)[0].why; }
+  else if (s<=-1){ tag="bear"; why = hits.filter(h=>h.w<0).sort((a,b)=>a.w-b.w)[0].why; }
+  else if (hits.length) why = "Mixed signals for gold";
+  return { s, tag, why };
+}
+
+/* ---------- Render news ---------- */
+let NEWS = [], FILTER = "all";
+const fmtDxb = d => new Intl.DateTimeFormat("en-GB",{timeZone:TZ,hour:"2-digit",minute:"2-digit",hour12:false}).format(d);
+function ago(d){
+  const m = Math.max(0,Math.round((Date.now()-d.getTime())/60000));
+  if (m<1) return "now"; if (m<60) return m+"m ago";
+  const h = Math.round(m/60); return h<48 ? h+"h ago" : Math.round(h/24)+"d ago";
+}
+function tagEl(tag){
+  const t = document.createElement("span"); t.className = "tag "+tag;
+  t.textContent = tag==="bull" ? "GOLD ▲" : tag==="bear" ? "GOLD ▼" : "NEUTRAL";
+  return t;
+}
+function renderNews(){
+  const ul = $("news"); ul.textContent = "";
+  const list = NEWS.filter(n=>FILTER==="all" || n.tag===FILTER);
+  if (!list.length){
+    const li = document.createElement("li"); li.className = "news-state";
+    li.textContent = NEWS.length ? "No headlines with that lean right now." : "Couldn't reach the news feeds. Tap Refresh to try again, or see the TradingView news in the Desk tab.";
+    ul.appendChild(li); return;
+  }
+  list.forEach(n=>{
+    const li = document.createElement("li");
+    const tm = document.createElement("div"); tm.className = "n-time";
+    const b = document.createElement("b"); b.textContent = fmtDxb(n.t);
+    tm.append(b, document.createTextNode(ago(n.t)));
+    const a = document.createElement("a"); a.className = "n-title"; a.href = n.link; a.target = "_blank"; a.rel = "noopener"; a.textContent = n.title;
+    const tk = document.createElement("div"); tk.className = "n-take";
+    const why = document.createElement("span"); why.textContent = n.why;
+    const src = document.createElement("span"); src.className = "src"; src.textContent = "· "+n.src;
+    tk.append(tagEl(n.tag), why, src);
+    li.append(tm, a, tk); ul.appendChild(li);
+  });
+}
+function renderFlash(){
+  const track = $("flash"); track.textContent = "";
+  const top = NEWS.slice(0,14);
+  if (!top.length){ const s = document.createElement("span"); s.className = "fl-empty"; s.textContent = "Headlines unavailable right now."; track.appendChild(s); track.style.animation = "none"; return; }
+  track.style.animation = "";
+  for (let pass=0; pass<2; pass++){
+    top.forEach(n=>{
+      const a = document.createElement("a"); a.className = "fl-item"; a.href = n.link; a.target = "_blank"; a.rel = "noopener";
+      if (pass) a.setAttribute("aria-hidden","true"), a.tabIndex = -1;
+      const t = document.createElement("time"); t.textContent = fmtDxb(n.t);
+      const s = document.createElement("span"); s.textContent = n.title;
+      a.append(t, tagEl(n.tag), s); track.appendChild(a);
+    });
+  }
+}
+function renderSentiment(){
+  const day = NEWS.filter(n=>Date.now()-n.t.getTime() < 24*3600e3);
+  const bull = day.filter(n=>n.tag==="bull").length, bear = day.filter(n=>n.tag==="bear").length;
+  const tot = bull+bear;
+  const bp = tot ? Math.round(bull/tot*100) : 50, sp = 100-bp;
+  $("m-news").querySelector(".l").style.width = bp+"%";
+  $("m-news").querySelector(".r").style.width = sp+"%";
+  $("m-bull").textContent = "Bullish "+bp+"%"; $("m-bear").textContent = "Bearish "+sp+"%";
+  const v = $("s-verdict");
+  if (!tot){ v.textContent = NEWS.length ? "No clear lean" : "Waiting"; v.className = "s-verdict flat"; }
+  else if (bp>=60){ v.textContent = "Bullish"; v.className = "s-verdict bull"; }
+  else if (sp>=60){ v.textContent = "Bearish"; v.className = "s-verdict bear"; }
+  else { v.textContent = "Mixed"; v.className = "s-verdict flat"; }
+  $("sent-count").textContent = day.length+" headlines · 24h";
+}
+
+let loading = false;
+async function refreshNews(){
+  if (loading) return; loading = true;
+  const btn = $("refresh"); btn.disabled = true; btn.textContent = "Loading…";
+  const all = (await Promise.all(FEEDS.map(loadFeed))).flat();
+  const seen = new Set();
+  const fresh = all
+    .filter(n=>n.title && n.link && n.t instanceof Date && !isNaN(n.t))
+    .filter(n=>RELEVANT.test(n.title))
+    .filter(n=>{ const k = n.title.toLowerCase().replace(/\W+/g," ").slice(0,70); if (seen.has(k)) return false; seen.add(k); return true; })
+    .sort((a,b)=>b.t-a.t)
+    .slice(0,40)
+    .map(n=>({ ...n, ...score(n.title) }));
+  if (fresh.length || !NEWS.length) NEWS = fresh;
+  const okFeeds = new Set(all.map(n=>n.src));
+  $("news-foot").textContent = (okFeeds.size ? "Sources: "+[...okFeeds].join(", ")+" · " : "") + "Updated "+fmtDxb(new Date())+" GST · auto-refresh every 3 minutes";
+  renderNews(); renderFlash(); renderSentiment();
+  btn.disabled = false; btn.textContent = "↻ Refresh"; loading = false;
+}
+document.querySelectorAll(".fbtn").forEach(b=>b.addEventListener("click",()=>{
+  FILTER = b.dataset.f;
+  document.querySelectorAll(".fbtn").forEach(x=>x.setAttribute("aria-pressed", x===b ? "true" : "false"));
+  renderNews();
+}));
+$("refresh").addEventListener("click",refreshNews);
+refreshNews();
+setInterval(refreshNews, 3*60*1000);
 
 /* ---------- Time helpers (DST-safe via Intl) ---------- */
 function parts(tz, d=new Date()){
@@ -420,165 +835,129 @@ function parts(tz, d=new Date()){
 }
 const pad = n => String(n).padStart(2,"0");
 const fmtHMS = s => { s=Math.max(0,Math.floor(s)); return pad(Math.floor(s/3600))+":"+pad(Math.floor(s%3600/60))+":"+pad(s%60); };
-
-// UTC offset (minutes) of a zone at a given instant
 function offsetMin(tz, d){
   const p = parts(tz,d);
-  const asUTC = Date.UTC(p.y,p.mo-1,p.d,p.h,p.m,p.s);
-  return Math.round((asUTC - Math.floor(d.getTime()/1000)*1000)/60000);
+  return Math.round((Date.UTC(p.y,p.mo-1,p.d,p.h,p.m,p.s) - Math.floor(d.getTime()/1000)*1000)/60000);
 }
-// Instant for a wall-clock time in a zone
 function zonedInstant(tz, y, mo, d, h, m){
-  let guess = Date.UTC(y,mo-1,d,h,m);
+  const guess = Date.UTC(y,mo-1,d,h,m);
   const off = offsetMin(tz,new Date(guess));
   let t = guess - off*60000;
   const off2 = offsetMin(tz,new Date(t));
   if (off2!==off) t = guess - off2*60000;
   return new Date(t);
 }
-const dubaiHM = d => new Intl.DateTimeFormat("en-GB",{timeZone:TZ,hour:"2-digit",minute:"2-digit",hour12:false}).format(d);
 const dubaiDay = d => new Intl.DateTimeFormat("en-GB",{timeZone:TZ,weekday:"short"}).format(d);
 
-/* ---------- Sessions (local market hours, forex week only) ---------- */
+/* ---------- Sessions & kill zones ---------- */
 const SESSIONS = [
-  { name:"SYDNEY", tz:"Australia/Sydney", open:7*60,  close:16*60 },
-  { name:"TOKYO",  tz:"Asia/Tokyo",       open:9*60,  close:18*60 },
-  { name:"LONDON", tz:"Europe/London",    open:8*60,  close:17*60 },
+  { name:"SYDNEY",   tz:"Australia/Sydney", open:7*60, close:16*60 },
+  { name:"TOKYO",    tz:"Asia/Tokyo",       open:9*60, close:18*60 },
+  { name:"LONDON",   tz:"Europe/London",    open:8*60, close:17*60 },
   { name:"NEW YORK", tz:"America/New_York", open:8*60, close:17*60 }
 ];
-// ICT kill zones, New York time
 const KILLZONES = [
-  { name:"Asian KZ",   open:20*60, close:24*60 },
-  { name:"London KZ",  open:2*60,  close:5*60 },
-  { name:"NY AM KZ",   open:7*60,  close:10*60 },
-  { name:"London Close", open:10*60, close:12*60 },
-  { name:"NY PM",      open:13*60+30, close:16*60 }
+  { name:"Asian KZ",     open:20*60,    close:24*60 },
+  { name:"London KZ",    open:2*60,     close:5*60 },
+  { name:"NY AM KZ",     open:7*60,     close:10*60 },
+  { name:"London Close", open:10*60,    close:12*60 },
+  { name:"NY PM",        open:13*60+30, close:16*60 }
 ];
-
-const sessEl = document.getElementById("sess");
-SESSIONS.forEach((s,i)=>{
-  s.row = document.createElement("div"); s.row.className="s-row";
+SESSIONS.forEach(s=>{
+  s.row = document.createElement("div"); s.row.className = "s-row";
   s.row.innerHTML = '<span class="s-name"></span><div class="bar"><span></span></div><span class="s-state"></span>';
   s.row.querySelector(".s-name").textContent = s.name;
-  sessEl.appendChild(s.row);
+  $("sess").appendChild(s.row);
 });
-
 function marketOpen(now){
-  // Forex week: Sun 17:00 NY to Fri 17:00 NY
   const ny = parts("America/New_York",now);
   if (ny.wd==="Sat") return false;
   if (ny.wd==="Sun" && ny.mins<17*60) return false;
   if (ny.wd==="Fri" && ny.mins>=17*60) return false;
   return true;
 }
-
 function tick(){
   const now = new Date();
   const dx = parts(TZ,now), ln = parts("Europe/London",now), ny = parts("America/New_York",now);
-  document.getElementById("clk-dxb").textContent = pad(dx.h)+":"+pad(dx.m)+":"+pad(dx.s);
-  document.getElementById("clk-lon").textContent = pad(ln.h)+":"+pad(ln.m);
-  document.getElementById("clk-ny").textContent  = pad(ny.h)+":"+pad(ny.m);
-
+  $("clk-dxb").textContent = pad(dx.h)+":"+pad(dx.m)+":"+pad(dx.s);
+  $("clk-lon").textContent = pad(ln.h)+":"+pad(ln.m);
+  $("clk-ny").textContent  = pad(ny.h)+":"+pad(ny.m);
   const open = marketOpen(now);
 
   SESSIONS.forEach(s=>{
     const p = parts(s.tz,now);
     const on = open && p.wd!=="Sat" && p.wd!=="Sun" && p.mins>=s.open && p.mins<s.close;
     s.row.classList.toggle("on",on);
-    const span = s.row.querySelector(".bar span");
-    const st = s.row.querySelector(".s-state");
+    const span = s.row.querySelector(".bar span"), st = s.row.querySelector(".s-state");
     if (on){
       span.style.width = ((p.mins-s.open)/(s.close-s.open)*100).toFixed(1)+"%";
       st.textContent = "OPEN "+fmtHMS((s.close-p.mins)*60 - p.s).slice(0,5);
     } else {
       span.style.width = "0%";
-      // Next open in Dubai time
-      let t = zonedInstant(s.tz,p.y,p.mo,p.d,Math.floor(s.open/60),s.open%60);
-      let guard = 0;
-      while ((t<=now || ["Sat","Sun"].includes(parts(s.tz,t).wd)) && guard++<8) t = new Date(t.getTime()+86400000);
-      st.textContent = dubaiDay(t)+" "+dubaiHM(t);
+      let t = zonedInstant(s.tz,p.y,p.mo,p.d,Math.floor(s.open/60),s.open%60), g = 0;
+      while ((t<=now || ["Sat","Sun"].includes(parts(s.tz,t).wd)) && g++<8) t = new Date(t.getTime()+86400000);
+      st.textContent = dubaiDay(t)+" "+fmtDxb(t);
     }
   });
 
-  // Kill zone
-  const kzBox = document.getElementById("kz");
+  const kzBox = $("kz");
   const kz = open ? KILLZONES.find(k=>ny.mins>=k.open && ny.mins<k.close) : null;
   if (kz){
     kzBox.classList.add("active");
-    document.getElementById("kz-name").textContent = kz.name+" active";
-    document.getElementById("kz-time").textContent = "ends in "+fmtHMS((kz.close-ny.mins)*60-ny.s).slice(0,5);
+    $("kz-name").textContent = kz.name+" active";
+    $("kz-time").textContent = "ends in "+fmtHMS((kz.close-ny.mins)*60-ny.s).slice(0,5);
   } else {
     kzBox.classList.remove("active");
-    // next kill zone start
-    let best=null;
+    let best = null;
     for (let add=0; add<4 && !best; add++){
-      const base = new Date(now.getTime()+add*86400000);
-      const bp = parts("America/New_York",base);
+      const bp = parts("America/New_York",new Date(now.getTime()+add*86400000));
       for (const k of KILLZONES){
         const t = zonedInstant("America/New_York",bp.y,bp.mo,bp.d,Math.floor(k.open/60)%24,k.open%60);
-        if (t>now && marketOpen(new Date(t.getTime()+60000)) && (!best || t<best.t)) best={k,t};
+        if (t>now && marketOpen(new Date(t.getTime()+60000)) && (!best || t<best.t)) best = {k,t};
       }
     }
-    document.getElementById("kz-name").textContent = open ? "No kill zone" : "Market closed";
-    document.getElementById("kz-time").textContent = best ? "Next: "+best.k.name+" · "+dubaiDay(best.t)+" "+dubaiHM(best.t)+" GST" : "";
+    $("kz-name").textContent = open ? "No kill zone" : "Market closed";
+    $("kz-time").textContent = best ? "Next: "+best.k.name+" · "+dubaiDay(best.t)+" "+fmtDxb(best.t)+" GST" : "";
   }
 
-  // Daily close countdown (NY 17:00) and entry window 1 min before
-  let close = zonedInstant("America/New_York",ny.y,ny.mo,ny.d,17,0);
-  let g=0;
+  let close = zonedInstant("America/New_York",ny.y,ny.mo,ny.d,17,0), g = 0;
   while ((close<=now || ["Sat","Sun"].includes(parts("America/New_York",close).wd)) && g++<8) close = new Date(close.getTime()+86400000);
   const closeWd = parts("America/New_York",close).wd;
   const secs = (close-now)/1000;
-  document.getElementById("cd").textContent = fmtHMS(secs);
-  const entry = new Date(close.getTime()-60000);
-  const chip = document.getElementById("cd-chip");
+  $("cd").textContent = fmtHMS(secs);
+  const entry = new Date(close.getTime()-60000), chip = $("cd-chip");
   if (CONFIG.showCloseWindow){
     if (closeWd==="Fri"){
-      chip.textContent="Skip · Friday"; chip.className="chip skip";
-      document.getElementById("cd-sub").textContent = "Weekly close "+dubaiDay(close)+" "+dubaiHM(close)+" GST · no entry (weekend gap)";
+      chip.textContent = "Skip · Friday"; chip.className = "chip skip";
+      $("cd-sub").textContent = "Weekly close "+dubaiDay(close)+" "+fmtDxb(close)+" GST · no entry (weekend gap)";
     } else {
-      chip.textContent = secs<=300 ? "Window open" : "Entry window"; chip.className = "chip" + (secs<=300?" go":"");
-      document.getElementById("cd-sub").textContent = "Close "+dubaiDay(close)+" "+dubaiHM(close)+" GST · entry "+dubaiHM(entry)+" GST, SL + TP set";
+      chip.textContent = secs<=300 ? "Window open" : "Entry window"; chip.className = "chip"+(secs<=300?" go":"");
+      $("cd-sub").textContent = "Close "+dubaiDay(close)+" "+fmtDxb(close)+" GST · entry "+fmtDxb(entry)+" GST, SL + TP set";
     }
   } else {
-    chip.textContent = closeWd==="Fri" ? "Weekly close" : "Daily close"; chip.className="chip";
-    document.getElementById("cd-sub").textContent = "Rollover "+dubaiDay(close)+" "+dubaiHM(close)+" GST";
+    chip.textContent = closeWd==="Fri" ? "Weekly close" : "Daily close"; chip.className = "chip";
+    $("cd-sub").textContent = "Rollover "+dubaiDay(close)+" "+fmtDxb(close)+" GST";
   }
 }
 tick(); setInterval(tick,1000);
 
-/* ---------- Gold vs Dollar overlay ---------- */
-tv("w-overlay","advanced-chart",{
-  autosize:true, symbol:"OANDA:XAUUSD", interval:"60", timezone:TZ,
-  theme:"dark", style:"1", locale:"en", backgroundColor:"#14120E",
-  gridColor:"rgba(42,37,27,0.6)", allow_symbol_change:false,
-  hide_top_toolbar:false, hide_side_toolbar:true, hide_legend:false, details:false,
-  compareSymbols:[{ symbol:"TVC:DXY", position:"NewPane" }],
-  support_host:"https://www.tradingview.com"
-});
-
-/* ---------- News Effect ----------
-   dir:  1 = a higher number is good for the USD (hawkish / strong economy)
-        -1 = a higher number is bad for the USD (weak labour market)
-   imp:  hi | md                                                        */
+/* ---------- News Effect ---------- */
 const EVENTS = [
-  { id:"cpi",    name:"CPI m/m",                    dir: 1, imp:"hi", unit:"%",  why:"Hotter inflation keeps the Fed hawkish" },
-  { id:"ccpi",   name:"Core CPI m/m",               dir: 1, imp:"hi", unit:"%",  why:"Hotter core inflation keeps rates higher for longer" },
-  { id:"nfp",    name:"Non-Farm Payrolls",          dir: 1, imp:"hi", unit:"K",  why:"Strong hiring supports higher rates" },
-  { id:"unemp",  name:"Unemployment Rate",          dir:-1, imp:"hi", unit:"%",  why:"Higher unemployment raises rate-cut odds" },
-  { id:"fed",    name:"Fed Funds Rate decision",    dir: 1, imp:"hi", unit:"%",  why:"A higher rate than expected lifts dollar yields" },
-  { id:"cpce",   name:"Core PCE m/m",               dir: 1, imp:"hi", unit:"%",  why:"The Fed's preferred inflation gauge" },
-  { id:"gdp",    name:"GDP q/q (advance)",          dir: 1, imp:"hi", unit:"%",  why:"Stronger growth supports the dollar" },
-  { id:"ppi",    name:"PPI m/m",                    dir: 1, imp:"md", unit:"%",  why:"Producer inflation feeds into CPI" },
-  { id:"retail", name:"Retail Sales m/m",           dir: 1, imp:"md", unit:"%",  why:"Strong consumer spending supports the dollar" },
+  { id:"cpi",    name:"CPI m/m",                    dir: 1, imp:"hi", unit:"%", why:"Hotter inflation keeps the Fed hawkish" },
+  { id:"ccpi",   name:"Core CPI m/m",               dir: 1, imp:"hi", unit:"%", why:"Hotter core inflation keeps rates higher for longer" },
+  { id:"nfp",    name:"Non-Farm Payrolls",          dir: 1, imp:"hi", unit:"K", why:"Strong hiring supports higher rates" },
+  { id:"unemp",  name:"Unemployment Rate",          dir:-1, imp:"hi", unit:"%", why:"Higher unemployment raises rate-cut odds" },
+  { id:"fed",    name:"Fed Funds Rate decision",    dir: 1, imp:"hi", unit:"%", why:"A higher rate than expected lifts dollar yields" },
+  { id:"cpce",   name:"Core PCE m/m",               dir: 1, imp:"hi", unit:"%", why:"The Fed's preferred inflation gauge" },
+  { id:"gdp",    name:"GDP q/q (advance)",          dir: 1, imp:"hi", unit:"%", why:"Stronger growth supports the dollar" },
+  { id:"ppi",    name:"PPI m/m",                    dir: 1, imp:"md", unit:"%", why:"Producer inflation feeds into CPI" },
+  { id:"retail", name:"Retail Sales m/m",           dir: 1, imp:"md", unit:"%", why:"Strong consumer spending supports the dollar" },
   { id:"ism",    name:"ISM Manufacturing / Services PMI", dir: 1, imp:"md", unit:"", why:"Above 50 means expansion" },
-  { id:"claims", name:"Initial Jobless Claims",     dir:-1, imp:"md", unit:"K",  why:"More claims point to a weakening job market" },
-  { id:"adp",    name:"ADP Employment",             dir: 1, imp:"md", unit:"K",  why:"Preview of Friday's NFP" },
-  { id:"jolts",  name:"JOLTS Job Openings",         dir: 1, imp:"md", unit:"M",  why:"More openings mean a tight labour market" }
+  { id:"claims", name:"Initial Jobless Claims",     dir:-1, imp:"md", unit:"K", why:"More claims point to a weakening job market" },
+  { id:"adp",    name:"ADP Employment",             dir: 1, imp:"md", unit:"K", why:"Preview of Friday's NFP" },
+  { id:"jolts",  name:"JOLTS Job Openings",         dir: 1, imp:"md", unit:"M", why:"More openings mean a tight labour market" }
 ];
-
-const evSel = document.getElementById("ne-ev");
-const cheat = document.getElementById("cheat");
+const evSel = $("ne-ev"), cheat = $("cheat");
 EVENTS.forEach(e=>{
   const o = document.createElement("option"); o.value = e.id; o.textContent = e.name; evSel.appendChild(o);
   const tr = document.createElement("tr"); tr.dataset.id = e.id;
@@ -589,63 +968,51 @@ EVENTS.forEach(e=>{
   tr.querySelector(".imp").classList.add(e.imp);
   tr.querySelector("span").textContent = e.name;
   tr.querySelector(".w").textContent = e.why;
-  tr.style.cursor = "pointer";
   tr.addEventListener("click",()=>{ evSel.value = e.id; newsEffect(); });
   cheat.appendChild(tr);
 });
-
 function setCard(el, state, word, sub){
-  el.className = "ne-card " + state;
+  el.className = "ne-card "+state;
   el.querySelector("b").textContent = word;
   el.querySelector("span").textContent = sub;
 }
 function newsEffect(){
   const e = EVENTS.find(x=>x.id===evSel.value) || EVENTS[0];
   [...cheat.children].forEach(tr=>tr.classList.toggle("sel", tr.dataset.id===e.id));
-  const fcRaw = document.getElementById("ne-fc").value, acRaw = document.getElementById("ne-ac").value;
-  const usdC = document.getElementById("ne-usd"), goldC = document.getElementById("ne-gold"), read = document.getElementById("ne-read");
+  const fcRaw = $("ne-fc").value, acRaw = $("ne-ac").value;
+  const usdC = $("ne-usd"), goldC = $("ne-gold"), read = $("ne-read");
+  read.textContent = "";
   if (fcRaw==="" || acRaw===""){
-    setCard(usdC,"flat","Waiting","Enter forecast and actual");
-    setCard(goldC,"flat","Waiting","");
-    read.textContent = ""; return;
+    setCard(usdC,"flat","Waiting","Enter forecast and actual"); setCard(goldC,"flat","Waiting",""); return;
   }
-  const fc = +fcRaw, ac = +acRaw, diff = +(ac-fc).toFixed(4);
-  const u = e.unit;
-  const diffTxt = (diff>0?"+":"") + diff + (u==="%"?" pts":u?(" "+u):"");
+  const diff = +((+acRaw)-(+fcRaw)).toFixed(4);
+  const diffTxt = (diff>0?"+":"")+diff+(e.unit==="%"?" pts":e.unit?(" "+e.unit):"");
   if (diff===0){
     setCard(usdC,"flat","In line","Actual = forecast");
     setCard(goldC,"flat","No surprise","Watch the details and revisions");
-    read.innerHTML = ""; read.textContent = e.name+" came in as expected. Price usually follows the existing trend or reacts to revisions of the previous figure.";
+    read.textContent = e.name+" came in as expected. Price usually follows the existing trend or reacts to revisions of the previous figure.";
     return;
   }
   const usdStrong = (diff>0) === (e.dir>0);
   setCard(usdC, usdStrong?"up":"down", usdStrong?"▲ Stronger":"▼ Weaker", "Surprise "+diffTxt);
   setCard(goldC, usdStrong?"down":"up", usdStrong?"▼ Pressure":"▲ Support", usdStrong?"Bias: look for sells":"Bias: look for buys");
-  read.innerHTML = "";
-  const s1 = document.createElement("strong");
-  s1.textContent = e.name + (diff>0?" above":" below") + " forecast. ";
-  read.append(s1, document.createTextNode(e.why + ", so the dollar "+(usdStrong?"tends to rise":"tends to fall")+" and gold "+(usdStrong?"tends to fall.":"tends to rise.")));
+  const s1 = document.createElement("strong"); s1.textContent = e.name+(diff>0?" above":" below")+" forecast. ";
+  read.append(s1, document.createTextNode(e.why+", so the dollar "+(usdStrong?"tends to rise":"tends to fall")+" and gold "+(usdStrong?"tends to fall.":"tends to rise.")));
 }
-["ne-ev","ne-fc","ne-ac"].forEach(id=>{
-  document.getElementById(id).addEventListener("input",newsEffect);
-  document.getElementById(id).addEventListener("change",newsEffect);
-});
+["ne-ev","ne-fc","ne-ac"].forEach(id=>{ $(id).addEventListener("input",newsEffect); $(id).addEventListener("change",newsEffect); });
 newsEffect();
 
 /* ---------- Lot calculator ---------- */
-const $ = id => document.getElementById(id);
-const usd = n => "$" + n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2});
+const usd = n => "$"+n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2});
 function calc(){
   const bal = +$("c-bal").value||0, risk = +$("c-risk").value||0, sl = +$("c-sl").value||0, tp = +$("c-tp").value||0;
   if (!sl){ ["o-lot","o-risk","o-rew","o-rr"].forEach(i=>$(i).textContent="—"); return; }
-  const riskUsd = bal*risk/100;
-  // $1 per pip per 1.00 lot on Exness XAUUSD (pip = $0.01)
-  let lot = Math.floor((riskUsd/sl)*100)/100;
+  let lot = Math.floor((bal*risk/100/sl)*100)/100;
   if (lot<0.01) lot = 0.01;
   $("o-lot").textContent = lot.toFixed(2);
   $("o-risk").textContent = usd(lot*sl);
   $("o-rew").textContent = usd(lot*tp);
-  $("o-rr").textContent = "1 : " + (tp/sl).toFixed(2);
+  $("o-rr").textContent = "1 : "+(tp/sl).toFixed(2);
 }
 ["c-bal","c-risk","c-sl","c-tp"].forEach(i=>$(i).addEventListener("input",calc));
 calc();
